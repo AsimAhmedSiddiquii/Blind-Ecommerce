@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bcart - Blind Ecommerce</title>
+    <link rel="icon" type="image/webp" href="/images/logo.webp">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/themify-icons.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+</head>
+
+
+<body onload="callOnload()">
+
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Register Section Begin -->
+    <div class="register-login-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 offset-lg-3">
+                    <div class="login-form">
+                        <h2>Login</h2>
+                        <% if(msg !='' ){%>
+                            <p class="alert alert-error" style="text-align: center;">
+                                <%= msg %>
+                            </p>
+                            <% } %>
+                                <form method="POST" action="/" id="somedata" role="form">
+                                    <div class="group-input">
+                                        <label>Select your Mode</label>
+                                        <select name="mode" id="mode" class="form-control" onchange="Mode()">
+                                            <option value="Blind Mode">Blind Mode</option>
+                                            <option value="User Mode">User Mode</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="group-input">
+                                        <label for="username">Username or email address *</label>
+                                        <input type="text" id="username" name="username" class="form-control">
+                                        <input type="hidden" id="usercopy">
+                                    </div>
+
+                                    <div class="group-input">
+                                        <label for="pass">Password *</label>
+                                        <input type="password" id="pass" name="password" class="form-control">
+                                        <input type="hidden" id="passcopy">
+                                    </div>
+
+                                    <input type="submit" class="site-btn login-btn" value="Sign In">
+                                </form>
+                                <div class="switch-login">
+                                    <a href="/registration" class="or-login">Or Create An Account</a>
+                                </div>
+
+                                <div class="text-center mt-2 mb-1">
+                                    <span id="action"></span>
+                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/javascripts/main.js"></script>
+
+    <script>
+        function Mode() {
+            var mode = document.getElementById("mode").value;
+            if (typeof (Storage) !== "undefined") {
+                sessionStorage.setItem("mode", mode);
+            }
+        }
+
+        var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        if (!isChrome) {
+            alert('Voice input not available');
+        }
+
+        var action = document.getElementById('action');
+
+        let speech = new SpeechSynthesisUtterance();
+        speech.lang = "en-US";
+        speech.volume = 1;
+        speech.rate = 1;
+        speech.pitch = 1;
+
+
+        function callOnload() {
+            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+            var recognition = new SpeechRecognition();
+            recognition.interimResults = true;
+
+            Mode();
+
+            speech.text = 'Welcome to Blind E-commerce website. To register, say, register, and to login say, Login';
+            window.speechSynthesis.speak(speech);
+
+            speech.onend = function (event) {
+                recognition.start();
+
+                recognition.onstart = function () {
+                    action.innerHTML = "<small>Listening, please speak…</small>";
+                };
+
+                recognition.onresult = function (event) {
+                    var transcript = event.results[0][0].transcript;
+                    console.log(transcript);
+                    action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                    recognition.stop();
+                    if (transcript.includes('login') || transcript.includes('log in') || transcript.includes('Login') || transcript.includes('signin')) {
+                        askForEmail();
+                    } else {
+                        if (transcript.includes('register') || transcript.includes('registration') || transcript.includes('signup')) {
+                            window.location.href = "/registration";
+                        }
+                    }
+                };
+            }
+        }
+
+        function askForEmail() {
+			var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+			var recognition = new SpeechRecognition();
+
+			speech.text = 'Please tell your, email address or username';
+			window.speechSynthesis.speak(speech);
+			speech.onend = function (event) {
+				recognition.start();
+
+				recognition.onstart = function () {
+					action.innerHTML = "<small>listening, please speak…</small>";
+				};
+
+				recognition.onresult = function (event) {
+					var transcript = event.results[0][0].transcript;
+					
+					action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+					document.getElementById('username').value = transcript;
+					recognition.stop();
+					askForPassword()
+				};
+			};
+		}
+
+        function askForPassword() {
+			var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+			var recognition = new SpeechRecognition();
+
+			speech.text = 'Please tell your, password';
+			window.speechSynthesis.speak(speech);
+			speech.onend = function (event) {
+				recognition.start();
+
+				recognition.onstart = function () {
+					action.innerHTML = "<small>listening, please speak…</small>";
+				};
+
+				recognition.onresult = function (event) {
+					var transcript = event.results[0][0].transcript;
+					console.log(transcript + '1');
+					action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+					document.getElementById('pass').value = transcript;
+					recognition.stop();
+					submitForm()
+				};
+			};
+		}
+
+        function submitForm() {
+			if (document.getElementById('email').value != "") {
+				if (document.getElementById('pass').value != "") {
+					document.getElementById('loginForm').submit();
+				}
+			} 
+		}
+
+    </script>

@@ -1,0 +1,116 @@
+<%- include('./common/header') %>
+
+    <body id="bodyLoader">
+        <!-- Page Preloder -->
+        <div id="preloder">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Header Section Begin -->
+        <header class="header-section">
+            <%- include('./common/headerBody') %>
+
+                <div class="nav-item">
+                    <div class="container">
+                        <nav class="nav-menu mobile-menu">
+                            <ul>
+                                <li><a href="/">Home</a></li>
+                                <li><a href="/shop">Shop</a></li>
+                                <li><a href="#">Collection</a>
+                                    <ul class="dropdown">
+                                        <li><a href="/shop/ladies">Ladies</a></li>
+                                        <li><a href="/shop/gents">Gents</a></li>
+                                        <li><a href="/shop/kids">Kid's</a></li>
+                                    </ul>
+                                </li>
+                                <li class="active"><a href="/contact">Contact</a></li>
+                                <li><a href="#">Pages</a>
+                                    <ul class="dropdown">
+                                        <li><a href="/shopping-cart">Shopping Cart</a></li>
+                                        <li><a href="/check-out">Checkout</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div id="mobile-menu-wrap"></div>
+                    </div>
+                </div>
+        </header>
+        <!-- Header End -->
+
+        <!-- Breadcrumb Section Begin -->
+        <div class="breacrumb-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="breadcrumb-text">
+                            <a href="#"><i class="fa fa-home"></i> Home</a>
+                            <span>Contact</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Breadcrumb Section Begin -->
+
+        <!-- Map Section Begin -->
+        <div class="map spad">
+            <div class="container">
+                <div class="map-inner">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.1687000118823!2d72.82913191489949!3d18.968155587149873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce40ffcfcacd%3A0x5d71ff22760f8e77!2sM.H.%20Saboo%20Siddik%20College%20of%20Engineering!5e0!3m2!1sen!2sin!4v1674544387330!5m2!1sen!2sin"
+                        height="610" style="border:0" allowfullscreen="">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+        <!-- Map Section Begin -->
+
+        <!-- Contact Section Begin -->
+        <section class="contact-section spad">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="contact-title">
+                            <h4>Contact Us</h4>
+                        </div>
+                        <div class="contact-widget">
+                            <div class="cw-item">
+                                <div class="ci-icon">
+                                    <i class="ti-location-pin"></i>
+                                </div>
+                                <div class="ci-text">
+                                    <span>Address:</span>
+                                    <p>Byculla, Mumbai</p>
+                                </div>
+                            </div>
+                            <div class="cw-item">
+                                <div class="ci-icon">
+                                    <i class="ti-mobile"></i>
+                                </div>
+                                <div class="ci-text">
+                                    <span>Phone:</span>
+                                    <p>+022-22222222</p>
+                                </div>
+                            </div>
+                            <div class="cw-item">
+                                <div class="ci-icon">
+                                    <i class="ti-email"></i>
+                                </div>
+                                <div class="ci-text">
+                                    <span>Email:</span>
+                                    <p> info@bcart.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        <!-- Contact Section End -->
+
+
+
+        <!-- Footer Section Begin -->
+        <%- include('./common/footer') %>

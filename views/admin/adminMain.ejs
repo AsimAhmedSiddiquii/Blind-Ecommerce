@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Bcart | Admin Panel</title>
+    <link rel="icon" type="image/webp" href="/images/logo.webp">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/stylesheets/styleAdmin.css">
+    <link rel="stylesheet" href="/stylesheets/all-themes.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet"
+        type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+
+<body class="theme-indigo">
+
+    <div class="modal fade" id="veiwProModal" role="dialog">
+        <div class="modal-dialog" style="width: 70%;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Product Details</h4>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover" id="Records">
+                                    <thead style="align-items:center;">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Category</th>
+                                            <th>Color</th>
+                                            <th>Tag</th>
+                                            <th>Stock</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if(proData.length !=0) { proData.forEach(function(row){ %>
+                                            <tr>
+                                                <td>
+                                                    <%= row.product_name %>
+                                                </td>
+                                                <td>
+                                                    <%= row.product_category %>
+                                                </td>
+                                                <td>
+                                                    <%= row.product_color %>
+                                                </td>
+                                                <td>
+                                                    <%= row.product_tags %>
+                                                </td>
+                                                <td>
+                                                    <%= row.product_stock %>
+                                                </td>
+                                                <td>
+                                                    <a href="/admin/edit/<%= row._id %>" class="btn btn-primary btn-xs"
+                                                        style="margin: 2%; text-decoration: none; border-radius: 4px; padding: 5%;">
+                                                        <span class="fa fa-edit btn-primary"
+                                                            style="margin-top: 6px; font-size: 15px;">
+                                                            Edit&nbsp;&nbsp;&nbsp;
+                                                        </span>
+                                                    </a>
+
+                                                    <a class="btn btn-danger btn-xs"
+                                                        style="margin: 2%; text-decoration: none; border-radius: 4px; padding: 5%;"
+                                                        href="/admin/delete/<%= row._id %>">
+                                                        <span class="fa fa-trash btn-danger"
+                                                            style="margin-top: 2px; font-size: 15px;">
+                                                            Delete&nbsp;&nbsp;&nbsp;
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% })}%>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="veiwSingleProModal" role="dialog">
+        <div class="modal-dialog" style="width: 70%;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Order Products</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover" id="Records">
+                                    <thead style="align-items:center;">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Product Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if(singleProData.length>0) {
+                                            singleProData.forEach(function(row){
+                                            %>
+                                            <tr>
+                                                <td>
+                                                    <%= row.product_name %>
+                                                </td>
+                                                <td>
+                                                    <%= row.product_total %>
+                                                </td>
+                                            </tr>
+                                            <% })}%>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addProModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" onclick="resetElement()">&times;</button>
+                    <h2 class="modal-title">
+                        <%=singleData['_id'] ?"Update product":"Add product" %>
+                    </h2>
+                </div>
+                <div class="modal-body">
+                    <form action="/admin" method="POST" role="form" enctype="multipart/form-data">
+                        <input type="hidden" class="form-control" name="proID" id="proID"
+                            value="<%=singleData['_id'] ?singleData['_id']:'' %>" />
+                        <div class="form-group">
+                            <label>Product Name </label>
+                            <% if(singleData['_id']){%>
+                                <input type="text" class="form-control" name="proName" id="proName"
+                                    value="<%= singleData['product_name'] %>" />
+                                <%}else{%>
+                                    <input type="text" class="form-control" name="proName" id="proName"
+                                        placeholder="Enter Product Name" />
+                                    <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <textarea class="form-control" id="proDesc" name="proDesc" rows="2" cols="10"
+                                placeholder="Enter Product Description" style="vertical-align: middle;">
+                                 <%= singleData['_id'] ?singleData['product_description']:'' %>
+                    </textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Price</label>
+                            <input type="text" class="form-control" name="proPrice" id="proPrice"
+                                placeholder="Enter Product Price"
+                                value="<%= singleData['_id'] ?singleData['product_price']:'' %>" />
+                        </div>
+                        <div class="form-group">
+                            <label>Product Category</label>
+                            <select class="form-control" id="proCat" name="proCat">
+                                <% if(singleData['_id']){ %>
+                                    <option>
+                                        <%= singleData['product_category'] %>
+                                    </option>
+                                    <% } %>
+                                        <option>Select product category</option>
+                                        <option>Ladies</option>
+                                        <option>Gents</option>
+                                        <option>Kids</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Brand</label>
+                            <select class="form-control" id="proBrand" name="proBrand">
+                                <% if(singleData['_id']){ %>
+                                    <option>
+                                        <%= singleData['product_brand'] %>
+                                    </option>
+                                    <% } %>
+                                        <option>Select product brand</option>
+                                        <option>Diesel</option>
+                                        <option>Polo</option>
+                                        <option>Zara</option>
+                                        <option>Gucci</option>
+                                        <option>Versace</option>
+                                        <option>Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Color</label>
+                            <select class="form-control" id="proColor" name="proColor">
+                                <% if(singleData['_id']){ %>
+                                    <option>
+                                        <%= singleData['product_color'] %>
+                                    </option>
+                                    <% } %>
+                                        <option>Select product color</option>
+                                        <option value="black">Black</option>
+                                        <option value="violet">Violet</option>
+                                        <option value="red">Red</option>
+                                        <option value="green">Green</option>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="grey">Grey</option>
+                                        <option value="pink">Pink</option>
+                                        <option value="purple">Purple</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Size</label>
+                            <select class="form-control" id="proSize" name="proSize">
+                                <% if(singleData['_id']){ %>
+                                    <option>
+                                        <%= singleData['product_size'] %>
+                                    </option>
+                                    <% } %>
+                                        <option>Select product size</option>
+                                        <option>L</option>
+                                        <option>M</option>
+                                        <option>XL</option>
+                                        <option>XXL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Tags</label>
+                            <select class="form-control" id="proTag" name="proTag">
+                                <% if(singleData['_id']){ %>
+                                    <option>
+                                        <%= singleData['product_tags'] %>
+                                    </option>
+                                    <% } %>
+                                        <option>Select product tags</option>
+                                        <option>Shoes</option>
+                                        <option>Jacket</option>
+                                        <option>Hat</option>
+                                        <option>Cloth</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Product Stock</label>
+                            <select class="form-control" id="proStock" name="proStock">
+                                <% if(singleData['_id']){ %>
+                                    <option>
+                                        <%= singleData['product_stock'] %>
+                                    </option>
+                                    <% } %>
+                                        <option>Select product stock</option>
+                                        <option>In stock</option>
+                                        <option>Out of stock</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Product Type</label>
+                            <select class="form-control" id="proType" name="proType">
+                                <% if(singleData['_id']){ %>
+                                    <option>
+                                        <%= singleData['product_type'] %>
+                                    </option>
+                                    <% } %>
+                                        <option>Select product type</option>
+                                        <option>General</option>
+                                        <option>Featured</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Upload Product Image </label>
+                            <input type="file" class="form-control" name="proImage" id="proImage" />
+                        </div>
+
+                        <% if(singleData['_id']){%>
+                            <br><br>
+                            <div class="form-group" style="text-align: center;">
+                                <input type="submit" class="btn btn-primary form-control" name="udpatePro"
+                                    id="udpatePro" value="Update product"
+                                    style="width:25% ;font-size: medium; border-radius: 15px;" />
+                            </div>
+                            <% }else{%>
+                                <br><br>
+                                <div class="form-group" style="text-align: center;">
+                                    <input type="submit" class="btn btn-primary form-control" name="addPro" id="addPro"
+                                        value="Add product"
+                                        style="width:25% ;font-size: medium; border-radius: 15px;" />
+                                </div>
+                                <% } %>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% if(singleData['_id']) { %>
+        <script>
+            $('#addProModal').modal({ backdrop: 'static', keyboard: false })
+        </script>
+        <% } if(singleProData){ %>
+            <script>
+                $('#veiwSingleProModal').modal({ backdrop: 'static', keyboard: false })
+            </script>
+            <% } %>
+
+                <div class="overlay"></div>
+                <nav class="navbar" style="position: fixed;">
+                    <div class="container-fluid">
+                        <div class="navbar-header sticy">
+                            <a href="javascript:void(0);" class="navbar-toggle collapsed" data-toggle="collapse"
+                                data-target="#navbar-collapse" aria-expanded="false"></a>
+                            <a href="javascript:void(0);" class="bars"></a>
+                            <a class="navbar-brand">Bcart | Admin Panel</a>
+                        </div>
+                    </div>
+                </nav>
+
+                <section>
+                    <aside id="leftsidebar" class="sidebar">
+
+                        <div class="menu">
+                            <ul class="list">
+
+                                <li class="active">
+                                    <a href="/admin">
+                                        <i class="material-icons">home</i>
+                                        <span>Home</span>
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="javascript:void(0);" class="menu-toggle">
+                                        <i class="material-icons">badge</i>
+                                        <span>Product</span>
+                                    </a>
+                                    <ul class="ml-menu">
+                                        <li>
+                                            <a href="#" data-toggle="modal" data-target="#addProModal">Add product</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" data-toggle="modal" data-target="#veiwProModal">View product</a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li>
+                                    <a href="javascript:void(0);" class="menu-toggle">
+                                        <i class="material-icons">shopping_cart</i>
+                                        <span>Orders</span>
+                                    </a>
+                                    <ul class="ml-menu">
+                                        <li>
+                                            <a href="/admin">Total order</a>
+                                        </li>
+                                        <li>
+                                            <a href="/admin/orders/Daily">Daily order</a>
+                                        </li>
+                                        <li>
+                                            <a href="/admin/orders/Order Cancelled">Daily Cancelled order</a>
+                                        </li>
+                                        <li>
+                                            <a href="/admin/orders/Order placed">Daily complete order</a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li>
+                                    <a href="/admin/logout">
+                                        <i class="material-icons">input</i>
+                                        <span>Logout</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </aside>
+
+                </section>
+
+                <section class="content">
+                    <div class="container-fluid">
+
+                        <div id="tableContent">
+                            <div class="row clearfix">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <div class="card">
+
+                                        <div class="panel panel-default">
+
+                                            <div class="panel-heading">
+                                                <h4>
+                                                    <%= orderData?orderData.length?orderData[0]['orderStatus']:'':'' %>
+                                                        Orders
+                                                </h4>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-bordered table-hover"
+                                                        id="Records">
+                                                        <thead style="align-items:center;">
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <th>Address</th>
+                                                                <th>Pincode</th>
+                                                                <th>Contact</th>
+                                                                <th>Order Date</th>
+                                                                <th>Order Status</th>
+                                                                <th>Action</th>
+                                                                <% if(orderData.length>0 &&
+                                                                    orderData[0]['orderStatus']=="Daily"){%>
+                                                                    <th>Change Status</th>
+                                                                    <% } %>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% if(orderData.length){ orderData.forEach(function(row){ %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%= row.full_name %>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <%= row.address %>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <%= row.pincode %>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <%= row.contact %>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <%= row.order_date %>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <%= row.order_status %>
+                                                                    </td>
+                                                                    <td>
+
+                                                                        <a class="btn btn-info btn-xs"
+                                                                            style="margin: 4%; text-decoration: none; border-radius: 4px; padding: 5%;"
+                                                                            href="/admin/fetchproduct/<%= row.order_id %>"><span
+                                                                                class="fa fa-eye btn-info"
+                                                                                style="margin-top: 6px; font-size: 15px;">
+                                                                                View</span> </a>
+
+                                                                    </td>
+                                                                    <% if(orderData.length!=0 &&
+                                                                        orderData[0]['orderStatus']=="Daily"){%>
+
+                                                                        <td>
+                                                                            <a class="btn btn-success btn-xs" style="margin: 4%; text-decoration: none; border-radius: 4px; padding: 5%;"
+                                                                                href="/admin/changeStatus/placed/<%= row.order_id %>"><span
+                                                                                    class="fa fa-check-circle btn-success"
+                                                                                    style="margin-top: 6px; font-size: 14px;">
+                                                                                    Complete Order</span>
+                                                                            </a>
+
+                                                                            <a class="btn btn-danger btn-xs" style="margin: 4%; text-decoration: none; border-radius: 4px; padding: 5%;"
+                                                                                href="/admin/changeStatus/cancelled/<%= row.order_id %>"><span
+                                                                                    class="fa fa-times-circle btn-danger"
+                                                                                    style="margin-top: 6px; font-size: 14px;">
+                                                                                    Cancel Order</span>
+                                                                            </a>
+
+                                                                        </td>
+                                                                        <% } %>
+
+                                                                </tr>
+                                                                <% })} %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </form>
+
+                                        <div class="body">
+                                            <div id="real_time_chart" class="dashboard-flot-chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <script>
+                        function blockNone() {
+                            if (document.getElementById("collaps").style.display == "block") {
+                                document.getElementById("collaps").style.display = 'none';
+                                document.getElementById("btnArrow").innerText = "keyboard_arrow_down";
+                            } else {
+                                document.getElementById("collaps").style.display = 'block';
+                                document.getElementById("btnArrow").innerText = "keyboard_arrow_up"
+                            }
+                        }
+
+                        function resetElement() {
+                            window.location = "/admin";
+                        }
+                    </script>
+                    <script src="/javascripts/admin.js"></script>
+
+</body>
+
+</html>

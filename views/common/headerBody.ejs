@@ -1,0 +1,18 @@
+<div class="header-top" id="headerTop">
+    <div class="container">
+        <div class="ht-left">
+            <div class="mail-service">
+                <img src="/images/logo.webp" height="24px">
+                Bcart
+            </div>
+        </div>
+
+        <div class="ht-right">
+            <% if(userInfo) { %>
+                <a href="/signout" class="login-panel"><i class="fa fa-sign-out"></i>Signout</a>
+            <% } else { %>
+                <a href="/" class="login-panel"><i class="fa fa-user"></i>Login</a>
+                <% } %>            
+        </div>
+    </div>
+</div>
