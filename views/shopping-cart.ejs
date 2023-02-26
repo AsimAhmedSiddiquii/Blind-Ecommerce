@@ -1,7 +1,6 @@
 <%- include('./common/header') %>
     <script>
-        var sum = 0
-        sessionStorage.clear();
+        var sum = 0;
     </script>
 
     <body id="bodyLoader">
@@ -138,7 +137,6 @@
                             </div>
                             <div class="col-lg-4 offset-lg-4">
                                 <div class="proceed-checkout">
-
                                     <ul>
                                         <li class="subtotal">Subtotal <span id="subTotal">
                                                 <%= sum %>
@@ -149,6 +147,10 @@
                                     </ul>
                                     <a href="/check-out" onclick="setSessionStorage('<%= cartData.length %>')"
                                         class="proceed-btn">PROCEED TO CHECK OUT</a>
+
+                                    <div class="text-center mt-2 mb-1">
+                                        <span id="action"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -180,6 +182,54 @@
                 for (counter = 1; counter <= parseInt(totalCount); counter++) {
                     sessionStorage.setItem('proTotal' + counter, document.getElementById('proTotal' + counter).innerText);
                     sessionStorage.setItem('subTotal', document.getElementById('subTotal').innerText)
+                }
+            }
+        </script>
+
+        <script>
+            let speech = new SpeechSynthesisUtterance();
+            speech.lang = "en-US";
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+
+            var action = document.getElementById('action');
+
+            if (sessionStorage.getItem("mode") == "Blind Mode") {
+                var cartData = <%- JSON.stringify(cartData) %>;
+                console.log(cartData)
+
+                if (cartData.length != 0) {
+                    speech.text = "You have " + cartData.length + 'items in your cart';
+                    window.speechSynthesis.speak(speech);
+                    cartData.forEach(element => {
+                        speech.text = "Product Name " + element.product_name;
+                        window.speechSynthesis.speak(speech);
+                    });
+                } else {
+                    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                    var recognition = new SpeechRecognition();
+
+                    speech.text = "Your shopping cart is empty, To add products in your cart say, `continue`";
+                    window.speechSynthesis.speak(speech);
+                    speech.onend = function (event) {
+                        recognition.start();
+
+                        recognition.onstart = function () {
+                            action.innerHTML = "<small>listening, please speak…</small>";
+                        };
+
+                        recognition.onresult = function (event) {
+                            var transcript = event.results[0][0].transcript;
+                            var confidence = event.results[0][0].confidence;
+                            console.log(transcript + '1');
+                            action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                            recognition.stop();
+                            if (transcript.includes('continue')) {
+                                window.location.href = '/shop'
+                            }
+                        };
+                    };
                 }
             }
         </script>

@@ -75,38 +75,38 @@
                                     <% if(orders.length!=0) { %>
                                         <% orders.forEach(function(order){ %>
                                             <% order.prods.forEach(function(prod){ %>
-                                            <tr>
-                                                <td class="p-text first-row">
-                                                        <%= prod.order_id %>
-                                                </td>
-
-                                                <td class="p-text first-row">
-                                                    <%= order.order_date %>
-                                                </td>
-
-                                                <td class="p-text first-row">
-                                                    <%= prod.product_name %>
-                                                </td>
-
-                                                <td class="p-price first-row">
-                                                    <%= prod.product_total %>
-                                                </td>
-
-                                                <td class="p-text first-row">
-                                                    <%= order.delAddress %>
-                                                </td>
-
-                                                <td class="p-text first-row">
-                                                    <%= order.order_status %>
-                                                </td>
-                                            </tr>
-                                            <% }) }) } else { %>
                                                 <tr>
-                                                    <td colspan="6" class="cart-title first-row">
-                                                        <h5 style="text-align: center;">No orders found.</h5>
+                                                    <td class="p-text first-row">
+                                                        <%= prod.order_id %>
+                                                    </td>
+
+                                                    <td class="p-text first-row">
+                                                        <%= order.order_date %>
+                                                    </td>
+
+                                                    <td class="p-text first-row">
+                                                        <%= prod.product_name %>
+                                                    </td>
+
+                                                    <td class="p-price first-row">
+                                                        <%= prod.product_total %>
+                                                    </td>
+
+                                                    <td class="p-text first-row">
+                                                        <%= order.delAddress %>
+                                                    </td>
+
+                                                    <td class="p-text first-row">
+                                                        <%= order.order_status %>
                                                     </td>
                                                 </tr>
-                                                <% } %>
+                                                <% }) }) } else { %>
+                                                    <tr>
+                                                        <td colspan="6" class="cart-title first-row">
+                                                            <h5 style="text-align: center;">No orders found.</h5>
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
@@ -117,10 +117,56 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="text-center mt-2 mb-1">
+                            <span id="action"></span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
+
+        <script>
+            let speech = new SpeechSynthesisUtterance();
+            speech.lang = "en-US";
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            
+            var action = document.getElementById('action');
+            
+            if (sessionStorage.getItem("mode") == "Blind Mode") {
+                var orders = <%- JSON.stringify(orders) %>;
+                
+                if (orders.length != 0) {
+                    speech.text = "Your recent order is " + orders[0].prods[0].product_name + ', and your order status is' + orders[0].order_status;
+                    window.speechSynthesis.speak(speech);
+                } else {
+                    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                    var recognition = new SpeechRecognition();
+
+                    speech.text = "You haven't ordered anything yet, To order say, `continue`";
+                    window.speechSynthesis.speak(speech);
+                    speech.onend = function (event) {
+                        recognition.start();
+
+                        recognition.onstart = function () {
+                            action.innerHTML = "<small>listening, please speak…</small>";
+                        };
+
+                        recognition.onresult = function (event) {
+                            var transcript = event.results[0][0].transcript;
+                            var confidence = event.results[0][0].confidence;
+                            console.log(transcript + '1');
+                            action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                            recognition.stop();
+                            if (transcript.includes('continue')) {
+                                window.location.href = '/shop'
+                            } 
+                        };
+                    };
+                }
+            }
+        </script>
 
         <!-- Footer Section Begin -->
         <%- include('./common/footer') %>

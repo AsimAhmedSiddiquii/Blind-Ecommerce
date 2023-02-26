@@ -24,7 +24,9 @@
     <link rel="stylesheet" href="stylesheets/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="stylesheets/style.css" type="text/css">
     <!--this is the voice taking url-->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 </head>
 
@@ -40,43 +42,65 @@
                 <div class="col-lg-6 offset-lg-3">
                     <div class="register-form">
                         <h2>Register</h2>
-                        <% if(msg !=''){%>
+                        <% if(msg !='' ){%>
                             <p class="alert alert-danger" style="text-align: center;">
                                 <%= msg %>
                             </p>
                             <% } %>
-                                <form method="POST" action="/registration" role="form" id="registerdata">
+                                <form method="POST" action="/registration" role="form" id="registerForm">
                                     <input type="hidden" id="in" style="width: 100%;height: 20%">
                                     <div class="group-input">
                                         <label for="name">Name *</label>
-                                        <input type="text" id="name" name="name">
-                                        <input type="hidden" id="namecopy">
-                                    </div>
-                                    <div class="group-input">
-                                        <label for="Contact">Contact *</label>
-                                        <input type="text" maxlength="10" id="contact" name="contact">
-                                        <input type="hidden" id="contactcopy">
+                                        <div class="row">
+                                            <div class="col-11">
+                                                <input type="text" id="name" name="name" class="form-control">
+                                            </div>
+                                            <div class="col-1" style="align-self: center;">
+                                                <a role="button" onclick="askForName()"><i class="fa fa-refresh"></i></a>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="group-input">
                                         <label for="username">Username or email address *</label>
-                                        <input type="text" id="username" name="username">
-                                        <input type="hidden" id="usernamecopy">
+                                        <div class="row">
+                                            <div class="col-11">
+                                                <input type="text" id="username" name="username">
+                                            </div>
+                                            <div class="col-1" style="align-self: center;">
+                                                <a role="button" onclick="askForEmail()"><i class="fa fa-refresh"></i></a>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="group-input">
                                         <label for="pass">Password *</label>
-                                        <input type="password" id="pass" name="pass">
-                                        <input type="hidden" id="passcopy">
+                                        <div class="row">
+                                            <div class="col-11">
+                                                <input type="password" id="pass" name="pass">
+                                            </div>
+                                            <div class="col-1" style="align-self: center;">
+                                                <a role="button" onclick="askForPassword()"><i class="fa fa-refresh"></i></a>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="group-input">
-                                        <label for="con_pass">Confirm Password *</label>
-                                        <input type="password" id="con_pass" name="con_pass">
-                                        <input type="hidden" id="con_passcopy">
+                                        <label for="Contact">Contact *</label>
+                                        <div class="row">
+                                            <div class="col-11">
+                                                <input type="text" maxlength="10" id="contact" name="contact">
+                                            </div>
+                                            <div class="col-1" style="align-self: center;">
+                                                <a role="button" onclick="askForPassword()"><i class="fa fa-refresh"></i></a>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <input type="submit" class="site-btn register-btn" value="REGISTER">
                                 </form>
                                 <div class="switch-login">
                                     <a href="/" class="or-login">Or Login</a>
+                                </div>
+                                <div class="text-center mt-2 mb-1">
+                                    <span id="action"></span>
                                 </div>
                     </div>
                 </div>
@@ -87,225 +111,159 @@
     <script src="/javascripts/main.js"></script>
 
     <script>
-        var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        if (sessionStorage.getItem("mode") == "Blind Mode") {
+            var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
-        if (!isChrome) {
-            alert('Voice input not available');
-        }
-
-        messageRecording = "Recording...", recognition = null;
-
-        function startRecognition(id) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = false;
-
-            recognition.onstart = function(event) {};
-
-            recognition.onresult = function(event) {
-                recognition.onend = null;
-
-                var text = "";
-                for (var i = event.resultIndex; i < event.results.length; ++i) {
-                    text += event.results[i][0].transcript;
-                }
-                setInput(text, id);
-            };
-
-            recognition.onend = function() {
-                stopRecognition();
-            };
-
-            recognition.lang = "en-US";
-            recognition.start();
-        }
-
-        function stopRecognition() {
-            if (recognition) {
-                recognition.stop();
-                recognition = null;
-                return true;
+            if (!isChrome) {
+                alert('Voice input not available');
             }
-        }
 
-        function switchRecognition(id) {
-            var temp = stopRecognition();
-            startRecognition(id);
-            return temp;
-        }
+            var action = document.getElementById('action');
 
-        function setInput(text, id) {
-            document.getElementById(id).value = text.split(" ").join();
-        }
-
-        function say(msg) {
             let speech = new SpeechSynthesisUtterance();
             speech.lang = "en-US";
-            speech.text = msg;
             speech.volume = 1;
             speech.rate = 1;
             speech.pitch = 1;
-            window.speechSynthesis.speak(speech);
-        }
 
-        function onLoad() {
-            var temp, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9, temp10, temp11, temp12, temp13, temp14, temp15, temp16, temp17, temp18, temp19, temp20;
-            say('This is registration page, if you want to start register say, start');
-            var obj = setInterval(switchRecognition, 5000, 'in');
+            function onLoad() {
+                var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                var recognition = new SpeechRecognition();
 
-            var obj1 = setInterval(function() {
-                var name = document.getElementById('name').value;
-                var contact = document.getElementById('contact').value;
-                var username = document.getElementById('username').value;
-                var password = document.getElementById('pass').value;
-                var inputVal = document.getElementById('in').value;
+                speech.text = 'This is registration page, if you want to register say, register, to login say, login';
+                window.speechSynthesis.speak(speech);
+                speech.onend = function (event) {
+                    recognition.start();
 
-                if ((inputVal == 'start')) {
-                    clearInterval(obj);
-                    document.getElementById('in').value = '';
-                    say('For signup, please tell me, Your name');
-                    switchRecognition('name');
-                }
+                    recognition.onstart = function () {
+                        action.innerHTML = "<small>listening, please speak…</small>";
+                    };
 
-                if (temp != true) {
-                    document.getElementById('in').value = 'some';
-                }
+                    recognition.onresult = function (event) {
+                        var transcript = event.results[0][0].transcript;
+                        var confidence = event.results[0][0].confidence;
+                        console.log(transcript + '1');
+                        action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                        recognition.stop();
+                        if (transcript.includes('register')) {
+                            askForName();
+                        } else if (transcript.includes('login')) {
+                            window.location.href = '/login'
+                        }
+                    };
+                };
+            }
 
-                if ((name != '') && (inputVal != '')) {
-                    temp = true;
-                    document.getElementById('namecopy').value = name;
-                    document.getElementById('in').value = '';
-                    say('please tell me, your contact number');
-                    switchRecognition('contact');
-                    temp1 = true;
-                } else if ((contact != '') && (temp1 == true)) {
-                    document.getElementById('contactcopy').value = contact;
-                    say('please tell me, your username');
-                    switchRecognition('username');
-                    temp1 = false;
-                    temp2 = true;
-                } else if ((username != '') && (temp2 == true)) {
-                    document.getElementById('usernamecopy').value = username;
-                    say('please tell me, your password');
-                    switchRecognition('pass');
-                    temp2 = false;
-                    temp3 = true;
-                } else if ((password != '') && (temp3 == true)) {
-                    document.getElementById('passcopy').value = password;
-                    say('please tell me, your confirm password');
-                    switchRecognition('con_pass');
-                    temp3 = false;
-                }
-            }, 50);
+            function askForName() {
+                var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                var recognition = new SpeechRecognition();
 
-            setInterval(function() {
-                var name = document.getElementById('name').value;
-                var contact = document.getElementById('contact').value;
-                var username = document.getElementById('username').value;
-                var password = document.getElementById('pass').value;
-                var con_pass = document.getElementById('con_pass').value;
-                var inputVal = document.getElementById('in').value;
+                speech.text = 'please tell your, full name';
+                window.speechSynthesis.speak(speech);
+                speech.onend = function (event) {
+                    recognition.start();
 
-                var namecopy = document.getElementById('namecopy').value;
-                var contactcopy = document.getElementById('contactcopy').value;
-                var usernamecopy = document.getElementById('usernamecopy').value;
-                var passcopy = document.getElementById('passcopy').value;
-                var con_passcopy = document.getElementById('con_passcopy').value;
+                    recognition.onstart = function () {
+                        action.innerHTML = "<small>listening, please speak…</small>";
+                    };
 
-                if (temp4 != false) {
-                    if ((name != '') && (contact != '') && (username != '') && (password != '') && (con_pass != '')) {
-                        clearInterval(obj1);
-                        document.getElementById('con_passcopy').value = con_pass;
-                        say('please verify your registration form input');
-                        say(name + ', Is this correct say, Yes or No');
-                        switchRecognition('in');
-                        temp4 = false;
-                        temp5 = true;
-                        temp6 = true;
+                    recognition.onresult = function (event) {
+                        var transcript = event.results[0][0].transcript;
+                        var confidence = event.results[0][0].confidence;
+                        console.log(transcript + '1');
+                        action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                        document.getElementById('name').value = transcript;
+                        recognition.stop();
+                        askForEmail()
+                    };
+                };
+            }
+
+            function askForEmail() {
+                var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                var recognition = new SpeechRecognition();
+
+                speech.text = 'please tell your, email address or username';
+                window.speechSynthesis.speak(speech);
+                speech.onend = function (event) {
+                    recognition.start();
+
+                    recognition.onstart = function () {
+                        action.innerHTML = "<small>listening, please speak…</small>";
+                    };
+
+                    recognition.onresult = function (event) {
+                        var transcript = event.results[0][0].transcript;
+                        var confidence = event.results[0][0].confidence;
+                        console.log(transcript + '1');
+                        action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                        document.getElementById('username').value = transcript;
+                        recognition.stop();
+                        askForPassword()
+                    };
+                };
+            }
+
+            function askForPassword() {
+                var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                var recognition = new SpeechRecognition();
+
+                speech.text = 'please tell your, password';
+                window.speechSynthesis.speak(speech);
+                speech.onend = function (event) {
+                    recognition.start();
+
+                    recognition.onstart = function () {
+                        action.innerHTML = "<small>listening, please speak…</small>";
+                    };
+
+                    recognition.onresult = function (event) {
+                        var transcript = event.results[0][0].transcript;
+                        var confidence = event.results[0][0].confidence;
+                        console.log(transcript + '1');
+                        action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                        document.getElementById('pass').value = transcript;
+                        recognition.stop();
+                        askForPhone()
+                    };
+                };
+            }
+
+            function askForPhone() {
+                var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                var recognition = new SpeechRecognition();
+
+                speech.text = 'please tell your, phone number';
+                window.speechSynthesis.speak(speech);
+                speech.onend = function (event) {
+                    recognition.start();
+
+                    recognition.onstart = function () {
+                        action.innerHTML = "<small>listening, please speak…</small>";
+                    };
+
+                    recognition.onresult = function (event) {
+                        var transcript = event.results[0][0].transcript;
+                        var confidence = event.results[0][0].confidence;
+                        console.log(transcript + '1');
+                        action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                        document.getElementById('contact').value = transcript;
+                        recognition.stop();
+                        submitForm()
+                    };
+                };
+            }
+
+            function submitForm() {
+                if (document.getElementById('name').value != "") {
+                    if (document.getElementById('username').value != "") {
+                        if (document.getElementById('pass').value != "") {
+                            if (document.getElementById('contact').value != "") {
+                                document.getElementById('registerForm').submit();
+                            }
+                        }
                     }
                 }
-
-                if ((inputVal == 'no') && (temp5 == true)) {
-                    temp5 = false;
-                    document.getElementById('in').value = '';
-                    say('Again tell me, your name');
-                    switchRecognition('name');
-                    temp7 = true;
-                } else if ((inputVal == 'yes') && (temp6 == true) || (name.localeCompare(namecopy) != 0) && (temp7 == true)) {
-                    temp5 = false;
-                    temp6 = false;
-                    temp7 = false;
-                    document.getElementById('in').value = '';
-                    say(contact + ', Is this correct your contact say, YES or NO');
-                    switchRecognition('in');
-                    temp12 = true;
-                    temp18 = true;
-                } else if ((inputVal == 'no') && (temp18 == true)) {
-                    temp18 = false;
-                    say('Again tell me, your contact');
-                    switchRecognition('contact');
-                    document.getElementById('in').value = '';
-                    temp8 = true;
-                } else if ((inputVal == 'yes') && (temp12 == true) || (contact.localeCompare(contactcopy) != 0) && (temp8 == true)) {
-                    temp8 = false;
-                    temp12 = false;
-                    temp18 = false
-                    document.getElementById('in').value = '';
-                    say(username + ', Is this correct your username say, YES or NO');
-                    switchRecognition('in');
-                    temp9 = true;
-                    temp11 = true;
-
-                } else if ((inputVal == 'no') && (temp9 == true)) {
-                    temp9 = false;
-                    document.getElementById('in').value = '';
-                    say('Again tell me, your username');
-                    switchRecognition('username');
-                    temp10 = true;
-                } else if ((inputVal == 'yes') && (temp11 == true) || (username.localeCompare(usernamecopy) != 0) && (temp10 == true)) {
-                    temp11 = false;
-                    temp10 = false;
-                    temp9 = false;
-                    document.getElementById('in').value = '';
-                    say(password + ', Is this correct your password say, YES or NO');
-                    switchRecognition('in');
-                    temp13 = true;
-                    temp19 = true;
-                } else if ((inputVal == 'no') && (temp19 == true)) {
-                    temp19 = false;
-                    document.getElementById('in').value = '';
-                    say('Again tell me, your password');
-                    switchRecognition('pass');
-                    temp14 = true;
-                } else if ((inputVal == 'yes') && (temp13 == true) || (password.localeCompare(passcopy) != 0) && (temp14 == true)) {
-                    temp19 = false;
-                    temp14 = false;
-                    temp13 = false;
-                    document.getElementById('in').value = '';
-                    say(con_pass + ', Is this correct your confirm password say, YES or NO');
-                    switchRecognition('in');
-                    temp15 = true;
-                    temp16 = true;
-                } else if ((inputVal == 'no') && (temp16 == true)) {
-                    temp16 = false;
-                    document.getElementById('in').value = '';
-                    say('Again tell me, your confirm password');
-                    switchRecognition('con_pass');
-                    temp17 = true;
-                } else if ((inputVal == 'yes') && (temp15 == true) || (con_pass.localeCompare(con_passcopy) != 0) && (temp17 == true)) {
-                    temp15 = false;
-                    temp17 = false;
-                    temp16 = false;
-                    say('if you want to register, please say submit');
-                    switchRecognition('in');
-                    document.getElementById('in').value = '';
-                    temp20 = true;
-
-                } else if ((name != '') && (contact != '') && (username != '') && (password != '') && (con_pass != '') && (inputVal == 'submit') && (temp20 == true)) {
-                    temp20 = false;
-                    document.getElementById('registerdata').submit();
-
-                }
-            }, 10000);
+            }
         }
     </script>
