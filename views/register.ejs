@@ -86,10 +86,10 @@
                                         <label for="Contact">Contact *</label>
                                         <div class="row">
                                             <div class="col-11">
-                                                <input type="text" maxlength="10" id="contact" name="contact">
+                                                <input type="tel" onkeyup='this.value = this.value.replace(/[^0-9-]/g, "");' maxlength="10" id="contact" name="contact">
                                             </div>
                                             <div class="col-1" style="align-self: center;">
-                                                <a role="button" onclick="askForPassword()"><i class="fa fa-refresh"></i></a>
+                                                <a role="button" onclick="askForPhone()"><i class="fa fa-refresh"></i></a>
                                             </div>
                                         </div>
                                     </div>
