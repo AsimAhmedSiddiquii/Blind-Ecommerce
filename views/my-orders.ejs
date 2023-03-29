@@ -161,7 +161,11 @@
                             recognition.stop();
                             if (transcript.includes('continue')) {
                                 window.location.href = '/shop'
-                            } 
+                            } else if (transcript.includes('cart')) {
+                                window.location.href = '/shopping-cart'
+                            } else if (transcript.includes('orders')) {
+                                window.location.href = '/my-orders'
+                            }
                         };
                     };
                 }

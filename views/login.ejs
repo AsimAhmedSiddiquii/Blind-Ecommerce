@@ -46,7 +46,7 @@
                     <div class="login-form">
                         <h2>Login</h2>
                         <% if(msg !='' ){%>
-                            <p class="alert alert-danger" style="text-align: center;">
+                            <p class="alert alert-warning" style="text-align: center;">
                                 <%= msg %>
                             </p>
                             <% } %>
@@ -63,7 +63,7 @@
                                         <label for="username">Username or email address *</label>
                                         <div class="row">
                                             <div class="col-11">
-                                                <input type="text" id="username" name="username" class="form-control">
+                                                <input type="text" pattern="[A-Z0-9._%+-]+@[A-Z0-9.-]||+\.[A-Z]{2,4}" id="username" name="username" class="form-control" required>
                                             </div>
                                             <div class="col-1" style="align-self: center;">
                                                 <i onclick="askForEmail()" class="fa fa-refresh"></i>
@@ -75,10 +75,11 @@
                                         <label for="pass">Password *</label>
                                         <div class="row">
                                             <div class="col-11">
-                                                <input type="password" id="pass" name="password" class="form-control">
+                                                <input type="password" pattern="^[A-Za-z0-9_@/#&+-]*$" id="pass" name="password" class="form-control" required>
                                             </div>
                                             <div class="col-1" style="align-self: center;">
                                                     <i class="fa fa-refresh" onclick="askForPassword()"></i>
+                                                    <i class="fa fa-eye" onclick="showPassword()"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -121,6 +122,14 @@
         speech.rate = 1;
         speech.pitch = 1;
 
+        function showPassword(){
+            var passField = document.getElementById('pass');
+            if (passField.type == "password") {
+                passField.type = 'text'
+            } else {
+                passField.type = 'password'
+            }
+        }
 
         function callOnload() {
             var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;

@@ -2,33 +2,29 @@ var express = require('express');
 var router = express.Router();
 var loginModel = require('../models/login');
 
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
     res.render('login', { msg: '', userInfo: '' });
 });
 
-router.post('/', function(req, res, next) {
+router.post('/', function (req, res, next) {
     var username = req.body.username.toLowerCase();
     var password = req.body.password;
 
     var checkLogin = loginModel.countDocuments({ $and: [{ username: { $eq: username } }, { password: { $eq: password } }] });
-    checkLogin.exec(function(err, data) {
+    checkLogin.exec(function (err, data) {
         if (data > 0) {
             req.session.userLogin = username;
-            if (req.body.mode == "Blind Mode") {
-                res.redirect('/shop');
-            } else {
-                res.redirect('/home');
-            }
+            res.redirect('/home');
         } else if (username == "admin" && password == "admin123") {
             req.session.adminLogin = username;
             res.redirect("/admin");
         } else {
-            res.render('login', { msg: 'Login Failed', userInfo: '' });
+            res.render('login', { msg: 'User Not Found', userInfo: '' });
         }
     });
 });
 
-router.get('/signout', function(req, res, next) {
+router.get('/signout', function (req, res, next) {
     req.session.destroy()
     res.redirect('/')
 });

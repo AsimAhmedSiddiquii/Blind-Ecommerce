@@ -1,10 +1,8 @@
 <%- include("./common/header") %>
 
-    <body id="bodyLoader">
-        <% if(featureProData.length){
-        featureProData.forEach(function(row){  
-           if(row.product_category=="ladies" || row.product_category=="gents" ||row.product_category=="kids"){
-        %>
+    <body id="bodyLoader" onload="callOnload()">
+        <% if(featureProData.length){ featureProData.forEach(function(row){ if(row.product_category=="ladies" ||
+            row.product_category=="gents" ||row.product_category=="kids" ){ %>
 
             <!-- Modal -->
             <div class="modal fade" id="myModal<%= row._id %>">
@@ -19,23 +17,30 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <img src="<%= row.product_image.toString().replace('public\\','\\') %>" alt="" width="100%" height="70%">
+                                    <img src="<%= row.product_image.toString().replace('public\\','\\') %>" alt=""
+                                        width="100%" height="70%">
                                 </div>
                                 <div class="col-sm-6" style="float: left;">
-                                    <b style="font-size: 22px;color: #E7AB3C;"> <%= row.product_name %> </b><br>
-                                    <b style="font-size: 22px;color: #E7AB3C;">₹  <%= row.product_price %></b><br>
+                                    <b style="font-size: 22px;color: #E7AB3C;">
+                                        <%= row.product_name %>
+                                    </b><br>
+                                    <b style="font-size: 22px;color: #E7AB3C;">₹ <%= row.product_price %></b><br>
                                     <hr>
                                     <p style="font-size: 16px;">
                                         <%= row.product_description %>
                                     </p>
                                 </div><br><br>
 
-                                <a onclick="showMsg()" href="/shopping-cart/addProduct/<%= row.product_name %>" class="btn" style="margin-left: 50%;font-size: 18px;width: 30%;border-radius: 15px;background-color: #E7AB3C;">Add to cart</a>
+                                <a onclick="showMsg()" href="/shopping-cart/addProduct/<%= row.product_name %>"
+                                    class="btn"
+                                    style="margin-left: 50%;font-size: 18px;width: 30%;border-radius: 15px;background-color: #E7AB3C;">Add
+                                    to cart</a>
                             </div>
 
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn" data-dismiss="modal" style="font-size: 18px;border-radius: 15px;background-color: #E7AB3C;">Close</button>
+                            <button type="button" class="btn" data-dismiss="modal"
+                                style="font-size: 18px;border-radius: 15px;background-color: #E7AB3C;">Close</button>
                         </div>
                     </div>
 
@@ -72,7 +77,7 @@
                                             <ul class="dropdown">
                                                 <li><a href="/shopping-cart">Shopping Cart</a></li>
                                                 <li><a href="/my-orders">My Orders</a></li>
-                                                <li><a href="/check-out">Checkout</a></li>  
+                                                <li><a href="/check-out">Checkout</a></li>
                                             </ul>
                                         </li>
                                         <li><a href="/contact">Contact</a></li>
@@ -83,7 +88,7 @@
                         </div>
                 </header>
                 <!-- Header End -->
-            
+
                 <!-- Banner Section Begin -->
                 <div class="banner-section spad">
                     <div class="container-fluid">
@@ -123,10 +128,58 @@
                 </div>
                 <!-- Banner Section End -->
 
-                
+
                 <script>
                     function showMsg() {
                         alert("Product added successfully");
+                    }
+
+                    let speech = new SpeechSynthesisUtterance();
+                    speech.lang = "en-US";
+                    speech.volume = 1;
+                    speech.rate = 1;
+                    speech.pitch = 1;
+
+                    function callOnload() {
+
+                        if (sessionStorage.getItem("mode") == "Blind Mode") {
+                            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                            var recognition = new SpeechRecognition();
+
+                            speech.text = 'Select the category to shop in, say, Gents, Ladies, or Kids, and';
+                            speech.text += 'To open shopping cart say, cart or to open my orders say, orders, to logout say, logout';
+                            window.speechSynthesis.speak(speech);
+
+                            speech.onend = function (event) {
+                                recognition.start();
+
+                                recognition.onstart = function () {
+                                    action.innerHTML = "<small>Listening, please speak…</small>";
+                                };
+
+                                recognition.onresult = function (event) {
+                                    var transcript = event.results[0][0].transcript;
+                                    console.log(transcript);
+                                    action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                                    recognition.stop();
+                                    if (transcript.includes('ladies') || transcript.includes('women') || transcript.includes('wo men') || transcript.includes('wimen')) {
+                                        window.location.href = '/shop/ladies'
+                                    } else if (transcript.includes('gents') || transcript.includes('men') || transcript.includes('man')) {
+                                        window.location.href = '/shop/gents'
+                                    } else if (transcript.includes('kids') || transcript.includes('child') || transcript.includes('children')) {
+                                        window.location.href = '/shop/kids'
+                                    } else if (transcript.includes('cart') || transcript.includes('shopping cart')) {
+                                        window.location.href = '/shopping-cart'
+                                    } else if (transcript.includes('orders') || transcript.includes('my orders')) {
+                                        window.location.href = '/my-orders'
+                                    } else if (transcript.includes('logout') || transcript.includes('log out') || transcript.includes('signout') || transcript.includes('sign out')) {
+                                        window.location.href = '/logout'
+                                    } else {
+                                        callOnload()
+                                    }
+                                };
+                            }
+                        }
                     }
                 </script>
                 <%- include('./common/footer') %>
