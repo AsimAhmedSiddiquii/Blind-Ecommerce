@@ -12,7 +12,7 @@ var now = currentDateTime.getDate() + "-" + (currentDateTime.getMonth() + 1) + "
 
 router.get('/', async function (req, res, next) {
   userInfo = { username: req.session.userLogin }
-  if (userInfo) {
+  if (userInfo.username) {
     var cartData = await cartModel.find({ user_name: req.session.userLogin });
     res.render('check-out', { cartData, userInfo });
   } else {
@@ -29,15 +29,13 @@ router.post('/', async function (req, res, next) {
   var address = req.body.address;
   var pinCode = req.body.pinCode;
   var city = req.body.city;
-  var email = req.body.email;
   var phone = req.body.phone;
   var paymentMethod = req.body.paymentMethod;
   var phone = req.body.phone;
-  var placeOrder = req.body.placeOrder;
 
   var cartLength = req.body.cartLength;
 
-  if (placeOrder && req.session.userLogin) {
+  if (req.session.userLogin) {
     for (i = 1; i <= parseInt(cartLength); i++) {
       var insertProduct = new orderdProductModel({
         order_id: order_id,
@@ -55,15 +53,16 @@ router.post('/', async function (req, res, next) {
       address: address,
       pincode: pinCode,
       city: city,
-      email_id: email,
+      email_id: req.session.userLogin,
       contact: phone,
       payment_method: paymentMethod,
       order_status: 'Pending'
     });
     await insertOrder.save();
     await cartModel.remove({ user_name: req.session.userLogin })
+    res.redirect('/my-orders');
   } else {
-    res.redirect('/home');
+    res.redirect('/');
   }
 });
 

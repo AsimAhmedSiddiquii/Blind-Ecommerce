@@ -7,25 +7,30 @@ var stateChange, userInfo;
 
 router.get('/:cat?', async function (req, res, next) {
     userInfo = { username: req.session.userLogin }
-    var cat = req.params.cat ? req.params.cat : "gents";
-    var options = {
-        offset: 1,
-        limit: 9
-    };
-    stateChange = 1;
+    if (req.session.userLogin) {
+        var cat = req.params.cat ? req.params.cat : "gents";
+        var options = {
+            offset: 1,
+            limit: 9
+        };
+        stateChange = 1;
 
-    var products = await productModel.find({ product_category: cat })
+        var products = await productModel.find({ product_category: cat })
 
-    productModel.paginate({ product_category: cat }, options).then(function (result) {
-        res.render('shop', {
-            recordChangeIndicater: stateChange,
-            records: products,
-            current: result.offset,
-            result: result.total,
-            pages: Math.ceil(result.total / result.limit),
-            userInfo: userInfo
+        productModel.paginate({ product_category: cat }, options).then(function (result) {
+            res.render('shop', {
+                recordChangeIndicater: stateChange,
+                records: products,
+                current: result.offset,
+                result: result.total,
+                pages: Math.ceil(result.total / result.limit),
+                userInfo: userInfo
+            });
         });
-    });
+    } else {
+        res.redirect('/')
+    }
+
 });
 
 router.post('/', async function (req, res, next) {
@@ -39,7 +44,7 @@ router.post('/', async function (req, res, next) {
         filters['product_brand'] = { $in: req.body.brandCheck }
     }
 
-    if (req.body.minPrice  && req.body.maxPrice) {
+    if (req.body.minPrice && req.body.maxPrice) {
         filters['product_price'] = { $gte: parseInt(req.body.minPrice), $lte: parseInt(req.body.maxPrice) }
     }
 

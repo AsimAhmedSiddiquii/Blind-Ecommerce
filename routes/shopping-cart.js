@@ -29,7 +29,7 @@ router.get('/addProduct/:proName', async function (req, res, next) {
 
 router.get('/', async function (req, res, next) {
   userInfo = { username: req.session.userLogin }
-  if (userInfo) {
+  if (req.session.userLogin) {
     var cartData = await cartModel.find({ user_name: req.session.userLogin });
     res.render('shopping-cart', { cartData, userInfo });
   } else {

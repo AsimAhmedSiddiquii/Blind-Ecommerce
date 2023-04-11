@@ -53,10 +53,12 @@
                                         <label for="name">Full Name *</label>
                                         <div class="row">
                                             <div class="col-11">
-                                                <input type="text" pattern="[a-zA-Z]{4,}(?: [a-zA-Z]+){0,2}" id="name" name="name" class="form-control" required>
+                                                <input type="text" pattern="[a-zA-Z]{4,}(?: [a-zA-Z]+){0,2}" id="name"
+                                                    name="name" class="form-control" required>
                                             </div>
                                             <div class="col-1" style="align-self: center;">
-                                                <a role="button" onclick="askForName()"><i class="fa fa-refresh"></i></a>
+                                                <a role="button" onclick="askForName()"><i
+                                                        class="fa fa-refresh"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -64,10 +66,12 @@
                                         <label for="username">Username or Email Address *</label>
                                         <div class="row">
                                             <div class="col-11">
-                                                <input type="text" pattern="[A-Z0-9._%+-]+@[A-Z0-9.-]||+\.[A-Z]{2,4}" id="username" name="username" required>
+                                                <input type="text" pattern="[A-Z0-9._%+-]+@[A-Z0-9.-]||+\.[A-Z]{2,4}"
+                                                    id="username" name="username" required>
                                             </div>
                                             <div class="col-1" style="align-self: center;">
-                                                <a role="button" onclick="askForEmail()"><i class="fa fa-refresh"></i></a>
+                                                <a role="button" onclick="askForEmail()"><i
+                                                        class="fa fa-refresh"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -75,10 +79,12 @@
                                         <label for="pass">Password *</label>
                                         <div class="row">
                                             <div class="col-11">
-                                                <input type="password" pattern="^[A-Za-z0-9_@/#&+-]*$" id="pass" name="pass" required>
+                                                <input type="password" pattern="^[A-Za-z0-9_@/#&+-]*$" id="pass"
+                                                    name="pass" required>
                                             </div>
                                             <div class="col-1" style="align-self: center;">
-                                                <a role="button" onclick="askForPassword()"><i class="fa fa-refresh"></i></a>
+                                                <a role="button" onclick="askForPassword()"><i
+                                                        class="fa fa-refresh"></i></a>
                                                 <i class="fa fa-eye" onclick="showPassword()"></i>
                                             </div>
                                         </div>
@@ -87,10 +93,12 @@
                                         <label for="Contact">Contact *</label>
                                         <div class="row">
                                             <div class="col-11">
-                                                <input type="tel" pattern="[0-9]{10}" maxlength="10" id="contact" name="contact" required>
+                                                <input type="tel" pattern="[0-9]{10}" maxlength="10" id="contact"
+                                                    name="contact" required>
                                             </div>
                                             <div class="col-1" style="align-self: center;">
-                                                <a role="button" onclick="askForPhone()"><i class="fa fa-refresh"></i></a>
+                                                <a role="button" onclick="askForPhone()"><i
+                                                        class="fa fa-refresh"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -142,14 +150,13 @@
 
                     recognition.onresult = function (event) {
                         var transcript = event.results[0][0].transcript;
-                        var confidence = event.results[0][0].confidence;
                         console.log(transcript + '1');
                         action.innerHTML = "<small>stopped listening, hope you are done…</small>"
                         recognition.stop();
                         if (transcript.includes('register')) {
                             askForName();
                         } else if (transcript.includes('login')) {
-                            window.location.href = '/login'
+                            window.location.href = '/'
                         }
                     };
                 };
@@ -170,7 +177,6 @@
 
                     recognition.onresult = function (event) {
                         var transcript = event.results[0][0].transcript;
-                        var confidence = event.results[0][0].confidence;
                         console.log(transcript + '1');
                         action.innerHTML = "<small>stopped listening, hope you are done…</small>"
                         document.getElementById('name').value = transcript;
@@ -195,8 +201,8 @@
 
                     recognition.onresult = function (event) {
                         var transcript = event.results[0][0].transcript;
-                        var confidence = event.results[0][0].confidence;
                         console.log(transcript + '1');
+                        transcript = transcript.replaceAll(' ', '');
                         action.innerHTML = "<small>stopped listening, hope you are done…</small>"
                         document.getElementById('username').value = transcript;
                         recognition.stop();
@@ -220,7 +226,7 @@
 
                     recognition.onresult = function (event) {
                         var transcript = event.results[0][0].transcript;
-                        var confidence = event.results[0][0].confidence;
+                        transcript = transcript.replaceAll(' ', '');
                         console.log(transcript + '1');
                         action.innerHTML = "<small>stopped listening, hope you are done…</small>"
                         document.getElementById('pass').value = transcript;
@@ -245,7 +251,7 @@
 
                     recognition.onresult = function (event) {
                         var transcript = event.results[0][0].transcript;
-                        var confidence = event.results[0][0].confidence;
+                        transcript = transcript.replaceAll(' ', '');
                         console.log(transcript + '1');
                         action.innerHTML = "<small>stopped listening, hope you are done…</small>"
                         document.getElementById('contact').value = transcript;
@@ -267,13 +273,13 @@
                 }
             }
 
-            function showPassword(){
-            var passField = document.getElementById('pass');
-            if (passField.type == "password") {
-                passField.type = 'text'
-            } else {
-                passField.type = 'password'
+            function showPassword() {
+                var passField = document.getElementById('pass');
+                if (passField.type == "password") {
+                    passField.type = 'text'
+                } else {
+                    passField.type = 'password'
+                }
             }
-        }
         }
     </script>

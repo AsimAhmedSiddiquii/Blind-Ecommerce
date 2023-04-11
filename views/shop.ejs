@@ -11,161 +11,90 @@
             <% } %>
                 <!--script on client-->
                 <script>
-                    var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-                    if (!isChrome) {
-                        alert('Voice input available');
-                    }
-
-                    messageRecording = "Recording...",
-                        recognition = null;
-
-                    function startRecognition(id) {
-                        recognition = new webkitSpeechRecognition();
-                        recognition.continuous = true;
-                        recognition.interimResults = false;
-
-                        recognition.onstart = function (event) { };
-                        recognition.onresult = function (event) {
-                            recognition.onend = null;
-
-                            var text = "";
-                            for (var i = event.resultIndex; i < event.results.length; ++i) {
-                                text += event.results[i][0].transcript;
-                            }
-                            setInput(text, id);
-                        };
-
-                        recognition.onend = function () {
-                            stopRecognition();
-                        };
-
-                        recognition.lang = "en-US";
-                        recognition.start();
-                    }
-
-                    function stopRecognition() {
-                        if (recognition) {
-                            recognition.stop();
-                            recognition = null;
-                            return true;
+                    if (sessionStorage.getItem("mode") == "Blind Mode") {
+                        var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+                        if (!isChrome) {
+                            alert('Voice input available');
                         }
-                    }
 
-                    function switchRecognition(id) {
-                        var temp = stopRecognition();
-                        startRecognition(id);
-                        return temp;
-                    }
-
-                    function setInput(text, id) {
-                        document.getElementById(id).value = text;
-                    }
-
-                    function say(msg) {
                         let speech = new SpeechSynthesisUtterance();
                         speech.lang = "en-US";
-                        speech.text = msg;
                         speech.volume = 1;
                         speech.rate = 1;
                         speech.pitch = 1;
-                        window.speechSynthesis.speak(speech);
-                    }
 
+                        function onLoad() {
+                            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                            var recognition = new SpeechRecognition();
 
-                    function onLoad() {
-                        var getIndicator = parseInt(getRecordIndicator);
-                        var temp, temp1, temp2, temp3, temp4, temp5, temp6;
-                        if (sessionStorage.getItem("mode") === "Blind Mode") {
+                            speech.text = 'This is shopping page, If you want to buy any product please follow the instruction. If you want to start shopping, you need to say, start, continue or begin';
+                            window.speechSynthesis.speak(speech);
+                            speech.onend = function (event) {
+                                recognition.start();
 
-                            if (getIndicator <= 1) {
-                                console.log("condition true");
-                                say('This is shopping page, You can buy any product, whatever you want, if you want to buy any product please follow the instruction. if you want to start shopping, you need to say, start');
-                                var obj1 = setInterval(switchRecognition, 9000, 'in');
-                            }
+                                recognition.onstart = function () {
+                                    
+                                };
+
+                                recognition.onresult = function (event) {
+                                    var transcript = event.results[0][0].transcript;
+                                    console.log(transcript + '1');
+                                    
+                                    recognition.stop();
+                                    if (transcript.includes('start') || transcript.includes('begin') || transcript.includes('continue')) {
+                                        askForProducts();
+                                    } else if (transcript.includes('cart') || transcript.includes('kat')) {
+                                        window.location.href = '/shopping-cart'
+                                    } else if (transcript.includes('orders') || transcript.includes('my orders')) {
+                                        window.location.href = '/my-orders'
+                                    }
+                                };
+                            };
                         }
 
-                        //first interval taking input
-                        var obj2 = setInterval(function () {
-                            var category = document.getElementById('category').value;
-                            var brand = document.getElementById('brand').value;
-                            var price = document.getElementById('price').value;
-                            var color = document.getElementById('color').value;
-                            var size = document.getElementById('size').value;
-                            var tags = document.getElementById('tags').value;
-                            var inputVal = document.getElementById('in').value;
+                        function askForProducts() {
+                            var records = <%- JSON.stringify(records) %>;
+                            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                            var recognition = new SpeechRecognition();
 
-                            if (sessionStorage.getItem("mode") === "Blind Mode") {
-                                if ((inputVal == 'start')) {
-                                    clearInterval(obj1);
-                                    document.getElementById('in').value = '';
-                                    say('For shopping, There is three categories of product `Ladies`. `Gents`. and `Kids` In which category, you want please say ');
-                                    switchRecognition('category');
-                                    temp7 = true;
+                            if (records.length != 0) {
+                                speech.text = 'There are following products available, to add the product in cart tell the order of the product, like first, second, or third';
+                                if (records.length >= 1) {
+                                    speech.text += ', First product is ' + records[0].product_name + ", price is " + records[0].product_price
                                 }
-
-                                if (temp != true) {
-                                    document.getElementById('in').value = 'some';
+                                if (records.length >= 2) {
+                                    speech.text += ', Second product is ' + records[1].product_name + ", price is " + records[1].product_price
                                 }
-
-
-                                if ((category != '') && (inputVal != '') && (temp7 == true)) {
-                                    temp7 = false;
-                                    temp = true;
-                                    //name value copy to the hidden text namecopy
-                                    //document.getElementById('namecopy').value=name;
-                                    //ended
-                                    document.getElementById('in').value = '';
-
-                                    say('There is two brand available whose name is, `Diesel`. and `Polo` which brand you want');
-                                    switchRecognition('brand');
-                                    temp1 = true;
-
-
-                                } else if ((brand != '') && (temp1 == true)) {
-                                    //contact value copy to the hidden text contactcopy
-                                    //document.getElementById('contactcopy').value=contact;
-                                    //copy ended
-                                    say('product available in range 300 to 3000, In which range you want, please say ');
-                                    switchRecognition('price');
-                                    temp1 = false;
-                                    temp2 = true;
-                                } else if ((price != '') && (temp2 == true)) {
-                                    //username value copy to the hidden text username copy
-                                    // document.getElementById('usernamecopy').value=username;
-                                    //copy ended
-                                    say('There is four color of product available whose name is, `black` `voilet` `red` and `green` In which color, you want');
-                                    switchRecognition('color');
-                                    temp2 = false;
-                                    temp3 = true;
-                                } else if ((color != '') && (temp3 == true)) {
-                                    //password value copy to the hidden text passwordcopy
-                                    //document.getElementById('passcopy').value=password;
-                                    //copy ended
-                                    say('There is four sizes of product availeble whose name is, `S` `M` `L` and `XL` which size, you want');
-                                    switchRecognition('size');
-                                    temp3 = false;
-                                    temp4 = true;
-
-                                } else if ((size != '') && (temp4 == true)) {
-                                    //password value copy to the hidden text passwordcopy
-                                    //document.getElementById('passcopy').value=password;
-                                    //copy ended
-                                    say('There is five type of product available whose name is, `shoes` `Jacket` `Dresses` `Hat` `BackPack` which product you want');
-                                    switchRecognition('tags');
-                                    temp4 = false;
-                                    temp5 = true;
-
-                                } else if ((category != '') && (brand != '') && (price != '') && (color != '') && (size != '') && (tags != '') && (temp5 == true)) {
-                                    say('if you want to submit, please say, SUBMIT. ');
-                                    switchRecognition('in');
-                                    temp5 = false;
-                                    temp6 = true;
-                                } else if ((inputVal == 'submit') && (temp6 == true)) {
-                                    temp6 = false;
-                                    document.getElementById('searchData').submit();
+                                if (records.length >= 3) {
+                                    speech.text += ', Third product is ' + records[2].product_name + ", price is " + records[2].product_price
                                 }
+                                window.speechSynthesis.speak(speech);
+                                speech.onend = function (event) {
+                                    recognition.start();
+
+                                    recognition.onstart = function () {
+                                       
+                                    };
+
+                                    recognition.onresult = function (event) {
+                                        var transcript = event.results[0][0].transcript;
+                                        console.log(transcript + '1');
+                                        recognition.stop();
+                                            var link = '/shopping-cart/addProduct/';
+                                        if (transcript.includes('first') || transcript.includes('fast') || transcript.includes('1st')) {
+                                            link += records[0].product_name;
+                                            window.location.href = link
+                                        } else if (transcript.includes('second') || transcript.includes('second') || transcript.includes('2nd')) {
+                                            link += records[1].product_name;
+                                            window.location.href = link
+                                        } else if (transcript.includes('third') || transcript.includes('third') || transcript.includes('3rd')) {
+                                            link += records[2].product_name;
+                                            window.location.href = link
+                                        }
+                                    };
+                                };
                             }
-                        }, 100);
+                        }
                     }
                 </script>
 
@@ -238,7 +167,8 @@
                                                     <input type="hidden" name="brand" id="brand">
 
                                                     <label for="Ladies">Ladies
-                                                        <input type="checkbox" id="Ladies" value="ladies" name="category">
+                                                        <input type="checkbox" id="Ladies" value="ladies"
+                                                            name="category">
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
@@ -302,28 +232,32 @@
                                                     <input type="hidden" name="brand" id="brand">
 
                                                     <label for="bc-diesel">Diesel
-                                                        <input type="checkbox" id="bc-diesel" name="brandCheck" value="Diesel">
+                                                        <input type="checkbox" id="bc-diesel" name="brandCheck"
+                                                            value="Diesel">
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
 
                                                 <div class="bc-item">
                                                     <label for="bc-polo">Polo
-                                                        <input type="checkbox" id="bc-polo" name="brandCheck" value="Polo">
+                                                        <input type="checkbox" id="bc-polo" name="brandCheck"
+                                                            value="Polo">
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
 
                                                 <div class="bc-item">
                                                     <label for="bc-zara">Zara
-                                                        <input type="checkbox" id="bc-zara" name="brandCheck" value="Zara">
+                                                        <input type="checkbox" id="bc-zara" name="brandCheck"
+                                                            value="Zara">
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
 
                                                 <div class="bc-item">
                                                     <label for="bc-others">Others
-                                                        <input type="checkbox" id="bc-others" name="brandCheck" value="Others">
+                                                        <input type="checkbox" id="bc-others" name="brandCheck"
+                                                            value="Others">
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
@@ -426,7 +360,8 @@
 
                                                                             <div class="modal-content">
                                                                                 <div class="modal-header">
-                                                                                    <h5 class="modal-title">Product Details</h5>
+                                                                                    <h5 class="modal-title">Product
+                                                                                        Details</h5>
                                                                                     <button type="button" class="close"
                                                                                         data-dismiss="modal">&times;</button>
                                                                                 </div>
@@ -439,24 +374,30 @@
                                                                                         </div>
                                                                                         <div class="col-sm-6"
                                                                                             style="float: left;">
-                                                                                            <b style="font-size: 18px; color: #E7AB3C;">
+                                                                                            <b
+                                                                                                style="font-size: 18px; color: #E7AB3C;">
                                                                                                 <%= row.product_name %>
                                                                                             </b><br>
-                                                                                            <b style="font-size: 20px; color: #E7AB3C;">₹
+                                                                                            <b
+                                                                                                style="font-size: 20px; color: #E7AB3C;">₹
                                                                                                 <%= row.product_price %>
                                                                                             </b><br>
                                                                                             <hr>
-                                                                                            Brand: <%= row.product_brand %><br>
-                                                                                            Category: <%= row.product_category %><br>
-                                                                                            <br>
-                                                                                            <% if(row.product_description
-                                                                                                !="" ) { %>
-                                                                                                <p
-                                                                                                    style="font-size: 14px; color: black; line-height: 20px;">
-                                                                                                    Description: <%= row.product_description
-                                                                                                        %>
-                                                                                                </p>
-                                                                                                <% } %>
+                                                                                            Brand: <%= row.product_brand
+                                                                                                %><br>
+                                                                                                Category: <%=
+                                                                                                    row.product_category
+                                                                                                    %><br>
+                                                                                                    <br>
+                                                                                                    <% if(row.product_description
+                                                                                                        !="" ) { %>
+                                                                                                        <p
+                                                                                                            style="font-size: 14px; color: black; line-height: 20px;">
+                                                                                                            Description:
+                                                                                                            <%= row.product_description
+                                                                                                                %>
+                                                                                                        </p>
+                                                                                                        <% } %>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>

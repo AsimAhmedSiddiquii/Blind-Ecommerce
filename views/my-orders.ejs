@@ -131,12 +131,12 @@
             speech.volume = 1;
             speech.rate = 1;
             speech.pitch = 1;
-            
+
             var action = document.getElementById('action');
-            
+
             if (sessionStorage.getItem("mode") == "Blind Mode") {
                 var orders = <%- JSON.stringify(orders) %>;
-                
+
                 if (orders.length != 0) {
                     speech.text = "Your recent order is " + orders[0].prods[0].product_name + ', and your order status is' + orders[0].order_status;
                     window.speechSynthesis.speak(speech);

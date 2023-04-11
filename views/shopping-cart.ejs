@@ -197,15 +197,38 @@
 
             if (sessionStorage.getItem("mode") == "Blind Mode") {
                 var cartData = <%- JSON.stringify(cartData) %>;
-                console.log(cartData)
 
                 if (cartData.length != 0) {
+                    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                    var recognition = new SpeechRecognition();
+
                     speech.text = "You have " + cartData.length + 'items in your cart';
                     window.speechSynthesis.speak(speech);
-                    cartData.forEach(element => {
-                        speech.text = "Product Name " + element.product_name;
+                   
+                    speech.onend = function (event) {
+                        speech.text = "To checkout say, continue, To add more products in your cart say, `shop`";
                         window.speechSynthesis.speak(speech);
-                    });
+                        speech.onend = function (event) {
+                            recognition.start();
+
+                            recognition.onstart = function () {
+                                action.innerHTML = "<small>listening, please speak…</small>";
+                            };
+
+                            recognition.onresult = function (event) {
+                                var transcript = event.results[0][0].transcript;
+                                var confidence = event.results[0][0].confidence;
+                                console.log(transcript + '1');
+                                action.innerHTML = "<small>stopped listening, hope you are done…</small>"
+                                recognition.stop();
+                                if (transcript.includes('continue') || transcript.includes('check out') || transcript.includes('checkout') || transcript.includes('check up')) {
+                                    window.location.href = '/check-out'
+                                } else if (transcript.includes('shop')) {
+                                    window.location.href = '/shop'
+                                }
+                            };
+                        };
+                    }
                 } else {
                     var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
                     var recognition = new SpeechRecognition();
